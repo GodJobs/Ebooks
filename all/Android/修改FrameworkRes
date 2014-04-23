@@ -1,0 +1,83 @@
+I have asked a question "how is framework-res.apk loaded?"(http:// 
+groups.google.com/group/android-porting/browse_thread/thread/ 
+730a22ab62d76c24/b07c2e7d54e98f79#b07c2e7d54e98f79) and got some 
+suggestions from Dianne. 
+My colleague got the solution about how to make resource apk of our 
+own self and I am sharing it with others and want some expert can tell 
+me whether there is any risk. ( Dianne suggested :Don't do it) 
+1. Make an apk project for your resource: AppRes 
+   write Android.mk as others and add command below to it: 
+#tell aapt to generate resource ID from 0x20 
+LOCAL_AAPT_FLAGS := -x 
+LOCAL_EXPORT_PACKAGE_RESOURCES := true 
+2. create an apk to use resource apk APP1 
+add command below to its Android.mk 
+{{{ 
+＃ include R.java of resource apk 
+LOCAL_INTERMEDIATE_SOURCES := $(framework-res-source-path)/my/own/ 
+resource/apk/R.java 
+}}} 
+
+3. modify Android build script 
+modify build/target/product/core.mk like below: 
+PRODUCT_PACKAGES := \ 
+    framework-res \ 
+    AppRes \                  <-- our resource apk name, created under 
+system/framework 
+ modify build/target/product/generic.mk 
+PRODUCT_PACKAGES := \ 
+    AlarmClock \ 
+    ...... 
+    SyncProvider \ 
+    App1                    <-- apk to use resouce, created under 
+system/app 
+4. modify frameworks/base/libs/utils/AssetManager.cpp 
+let android load both frame-res.apk and our resource apk. 
+//our resource apk path 
+static const char* kMyAssets = "framework/appres.apk"; 
+//修改下面的方法 
+bool AssetManager::addDefaultAssets() 
+{ 
+    const char* root = getenv("ANDROID_ROOT"); 
+    LOG_ALWAYS_FATAL_IF(root == NULL, "ANDROID_ROOT not set"); 
+/* This is original code 
+    String8 path(root); 
+    path.appendPath(kSystemAssets); 
+    return addAssetPath(path, NULL); 
+*/ 
+//add code below 
+        bool isOK1 = false; 
+        bool isOK2 = false; 
+        { // load framework-res.apk 
+                String8 path(root); 
+                path.appendPath(kSystemAssets); 
+                isOK1 = addAssetPath(path, NULL); 
+        } 
+        { // load our resource apk 
+                String8 path(root); 
+                path.appendPath(kMyAssets); 
+                isOK2 = addAssetPath(path, NULL); 
+        } 
+        return isOK1 && isOK2; 
+} 
+}}} 
+
+5. how to use it. 
+We can write code like below: 
+tv1 = (TextView) findViewById(R.id.tvWelcome1); 
+tv1.setText(my.own.resource.apk.R.string.welcome); 
+6. compile 
+>make clean 
+>make 
+
+if you got any error message complaining about needing resource apk, 
+do next: 
+>source build/envsetup.sh 
+>mmm packages/apps/AppRes/ 
+>make 
+
+My colleague tell me we even can add class to resource apk to share 
+it. 
+Any suggestion and question is welcome. 
+James 
+

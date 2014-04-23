@@ -1,0 +1,19 @@
+
+    编译好的源码可以导入eclipse中方便研究。
+    1、将 源码目录\development\ide\eclipse 中的.classpath复制到源码根目录下。
+    2、更改eclipse缓存设置
+        在eclipse安装根目录下修改eclipse.ini   
+        -Xms128m
+
+        -Xmx512m
+        -XX:MaxPermSize=256m
+    3、将 源码目录\development\ide\eclipse 中的android-formatting.xml和android.importorder导入eclipse
+        android-formatting.xml用来配置eclipse编辑器的代码风格；android.importorder用来配置eclipse的import的顺序和结构。
+
+        window->preferences->java->Code style->Formatter中导入android-formatting.xml
+        window->preferences->java->Code style->Organize Imports中导入android.importorder。
+    4、导入源码
+        最好重新换一个workspace，因为源码是比较庞大的。新建Java Project，指定一个name，接着将use default location勾掉，指定到你源码的目录下，finish。
+
+google-common_intermediates等两个包missing的解决办法
+将源代码目录下/frameworks/ex/common/java目录作为Java Build Path/Source包含进去即可。

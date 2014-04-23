@@ -1,0 +1,23 @@
+git push origin dvb-s:refs/for/dvb-s
+
+git clone ssh://lizhi@192.168.1.4:29418/newbox/ccdt/packages/apps/DvbPlayer.git
+git clone ssh://lizhi@192.168.1.4:29418/newbox/ccdt/frameworks/base/dvb.git
+ssh://vc.cn:29418/newbox/ccdt/frameworks/base/packages/DvbProvider.git
+ssh://vc.cn:29418/newbox/ccdt/frameworks/base/packages/DvbProvider.git
+
+"noinitrd console=ttyS1,115200n8 mtdparts=nx_2017:16m@0k(kernel),8m@16m(recovery),8m@24m(recovery),64m@32m(rootfs),128m@96m(system),272m@224m(data);nx_sfc:2m@0k(boot) ro
+ot=/dev/nfs nfsroot=192.168.11.15:/home/jjj/nfs/rootfs ip=192.168.11.211 rw"
+
+
+码流
+192.168.30.13
+administrator
+
+
+221.179.173.170
+
+sudo apt-get update && apt-get upgrade && apt-get dist-upgrade
+- 后台杀掉iptux；
+- cd ~/.gconf/apps/iptux
+- 删除iptux配置文件
+- 执行gconftool-2 –recursive-unset /apps/iptux
